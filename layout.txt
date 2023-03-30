@@ -1,3 +1,16 @@
-star_trek
-|_app.py
-|_
+|__star_trek
+    |__app/
+        |__templates/(includes blueprints for subdirectories)
+        |__static/
+        |__data(the json)
+    |__app.db
+    |__config.py
+    |__about/
+    |__admin/
+    |__contacts/
+    |__credits/
+    |__forums/
+    |__movies/
+    |__quadrant/
+    |__series
+    |__species
