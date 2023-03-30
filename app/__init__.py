@@ -11,6 +11,7 @@ def create_app(config_class=Config):
     app.config.from_object(config_class)
     
     # *Initialize Flask extensions here*
+    # db.app = app
     db.init_app(app)
     migrate.init_app(app, db)
     
@@ -36,3 +37,4 @@ def create_app(config_class=Config):
         return 'This is a test page'
     
     return app
+
