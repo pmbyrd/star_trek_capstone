@@ -1,6 +1,6 @@
 """A seed file to populate the database with sample date for the forums and post tables"""
 
-from app.trek_blueprints.forums.models import db, Post
+from app.trek_blueprints.forums.models.posts import db, Post
 
 # Create all tables
 db.drop_all()
