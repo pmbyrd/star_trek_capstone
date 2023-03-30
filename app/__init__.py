@@ -14,6 +14,9 @@ def create_app(config_class=Config):
     # *Register Blueprints here
     from app.main import bp as main_bp
     app.register_blueprint(main_bp)
+    # the file path for movies is app/trek_blueprints/movies/routes.py
+    from app.trek_blueprints.movies.routes import movie_bp
+    app.register_blueprint(movie_bp)
     
     @app.route('/')
     def index():
