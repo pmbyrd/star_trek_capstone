@@ -21,6 +21,12 @@ def create_app(config_class=Config):
     from app.trek_blueprints.movies.routes import movie_bp
     app.register_blueprint(movie_bp)
     
+    from app.trek_blueprints.admin import admin_bp
+    app.register_blueprint(admin_bp)
+    
+    from app.trek_blueprints.forums import forums_bp
+    app.register_blueprint(forums_bp)
+    
     @app.route('/')
     def index():
         return 'Hello Test index 2'

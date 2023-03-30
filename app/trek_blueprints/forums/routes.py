@@ -1,14 +1,8 @@
 """Handles the routes for the forums blueprint."""
-from flask import Blueprint, render_template
+from flask import render_template
+from app.trek_blueprints.forums import forums_bp
 
-forums = Blueprint(
-    'forums', __name__,
-    template_folder='templates',
-    static_folder='static',
-    static_url_path='/forums/static'
-)
-
-@forums.route('/forums')
+@forums_bp.route('/forums')
 def show_forums():
-    render_template('forums.html')
+    return "This is a test of the forums blueprint."
     
