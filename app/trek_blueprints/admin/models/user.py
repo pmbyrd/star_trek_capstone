@@ -63,7 +63,7 @@ class User(db.Model):
     
     
     @classmethod
-    def authenticate(cls, username, password):
+    def authenticate(cls, username, password, email):
         """Find user with `username` and `password`. If found, return user, else return False."""
         
         user = cls.query.filter_by(username=username).first()
