@@ -10,5 +10,5 @@ from app.extensions import db
 @admin_bp.route('/admin')
 def show_admin():
     """Displays the admin page."""
-    users = User.query.all()
+    users = User.query.limit(10).all()
     return render_template('/admin/index.html', users=users)

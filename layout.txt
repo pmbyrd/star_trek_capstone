@@ -5,23 +5,41 @@
         |__data(the json)
     |__app.db
     |__config.py
-    |__about/
-    |__admin/
-    |__contacts/
-    |__credits/
-    |__forums/
-        |__templates
-            |__show_posts.html
-            |__posts/
-                |__posts.html
-                NOW I WILL HAVE AN EASIER TIME ADDING MODULARITY
-            |__categories/
-                |__categories.html
-            |__question/
-                |__questions.html
-            |__tags/
-                |__tags.html
-    |__movies/
-    |__quadrant/
-    |__series
-    |__species
+    |__init__.py
+    |__trek_blueprints/
+        |__about/
+        |__admin/
+            |__templates/
+                |__admin.index.html
+                |__signup.html
+            |__models/
+                |__user.py
+                |__seed.py
+            |__static/
+                |__css
+                |__js
+            |__generator/(must import the helpers in this file)
+                |__create_csvs.py
+                |__users_csv
+            |__init__.py
+            |__routes.py
+        |__contacts/
+        |__credits/
+        |__forums/
+            |__templates
+                |__show_posts.html
+                |__posts/
+                    |__posts.html
+                    NOW I WILL HAVE AN EASIER TIME ADDING MODULARITY
+                |__categories/
+                    |__categories.html
+                |__question/
+                    |__questions.html
+                |__tags/
+                    |__tags.html
+            |__init__.py
+            |__routes.py
+        |__movies/
+        |__quadrant/
+        |__series/
+        |__species/

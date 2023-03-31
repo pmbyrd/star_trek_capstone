@@ -1,3 +1,4 @@
+"""This module contains the user model for the database."""
 
 from app.extensions import db
 from flask_bcrypt import Bcrypt 
@@ -7,7 +8,6 @@ bcrypt = Bcrypt()
 
 DEFAULT_IMAGE_URL = "https://loading.io/icon/tpi8gu"
 
-"""This module contains the user model for the database."""
 
 class User(db.Model):
     """Creates a user model for the database."""
@@ -28,6 +28,8 @@ class User(db.Model):
     password = db.Column(db.Text, nullable=False)
     
     bio = db.Column(db.Text, nullable=True)
+    
+    location = db.Column(db.Text, nullable=True)
     
     def __repr__(self):
         return f"<User #{self.id}: {self.username}, {self.email}>"
