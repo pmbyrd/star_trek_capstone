@@ -4,8 +4,7 @@
 
 #First I must import the blueprint object
 from flask import render_template, redirect, flash, g, session
-import sqlalchemy
-from sqlalchemy.exe import IntegrityError
+from sqlalchemy.exc import IntegrityError
 
 from app.trek_blueprints.admin import admin_bp
 # import the forms here
@@ -51,11 +50,11 @@ def show_admin():
     return render_template('/admin/index.html', users=users)
 
 # Todo implements a route for a user to signup
-@admin_bp.route('/admin/signup')
+@admin_bp.route('/admin/users/signup')
 def show_signup():
     """Displays the signup page."""
     signup_form = AddUserForm()
-    return render_template('/admin/signup.html', form=signup_form)
+    return render_template('/admin/users/signup.html', form=signup_form)
 
 #Todo create a post route for the user signup that handles the authentication method available on the classmethod signup
 @admin_bp.route('/admin/signup', methods=['POST'])
@@ -94,16 +93,17 @@ def handle_signup_form():
             return redirect('/admin/users/secret.html')
             # *Currently setting up a dummy route to test the form 
         except IntegrityError:
-            if User.query.filter_by(email=email).first() is not None:
-                flash("Email already taken", 'danger')
-                return render_template('users/signup.html', form=form)
-            if User.query.filter_by(username=username).first() is not None:
-                flash("Username already taken", 'danger')
-                return render_template('users/signup.html', form=form)
+            # Integrate the flash messages into the form
+            print("Integrity Error")
+            
            
     else:
-        flash('User creation failed. Please try again.')
-        # Indicate what went wrong  with the form
+        if User.query.filter_by(email=email).first() is not None:
+            flash("Email already taken", 'danger')
+            return render_template('users/signup.html', form=form)
+        if User.query.filter_by(username=username).first() is not None:
+            flash("Username already taken", 'danger')
+            # Indicate what went wrong  with the form
         
         return redirect('/admin/signup', form=form)
     #  except IntegrityError:
@@ -136,7 +136,8 @@ def handle_login_form():
     """Handles user authentication and authorization."""
     
     form = LoginForm()
-    if form.validate_on_submit():
+    try:
+       if form.validate_on_submit():
         username = form.username.data
         email = form.email.data
         password = form.password.data
@@ -144,11 +145,27 @@ def handle_login_form():
         user = User.authenticate(username=username, email=email, password=password)
         
         if user:
-            flash('User authenticated successfully!')
+            flash('You have successfully logged in!')
             return redirect('/admin/users')
-    else:
-        flash('Invalid username or password. Please try again.')
+        else:
+            flash('Invalid username or password. Please try again.')
+            return redirect('/admin/users/login')
+        
+    except IntegrityError:
+        # ?How can error handling be done better here?
+        # if the email is not found in the database we will return a message to the user 
+        if User.query.filter_by(email=email).first() is None:
+            flash("Email not found", 'danger')
+            return render_template('users/login.html', form=form)
+        if User.query.filter_by(username=username).first() is None:
+            flash("Username not found", 'danger')
+            return render_template('users/login.html', form=form)
+        if User.query.filter_by(password=password).first() is None:
+            flash("Incorrect password", 'danger')
+            return render_template('users/login.html', form=form)
         return redirect('/admin/users/login')
+   
+    
     
     
 #Todo create a route for the user to logout
