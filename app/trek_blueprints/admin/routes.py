@@ -3,7 +3,10 @@
 #!CRITICAL THIS ROUTE WILL CONTAIN SESSIONS AND AUTHENTICATION
 
 #First I must import the blueprint object
-from flask import render_template, redirect, flash
+from flask import render_template, redirect, flash, g, session
+import sqlalchemy
+from sqlalchemy.exe import IntegrityError
+
 from app.trek_blueprints.admin import admin_bp
 # import the forms here
 from app.trek_blueprints.admin.forms.signup import AddUserForm
@@ -11,6 +14,35 @@ from app.trek_blueprints.admin.forms.login import LoginForm
 # import database models and instances here
 from app.trek_blueprints.admin.models.user import User, DEFAULT_IMAGE_URL
 from app.extensions import db
+
+CURR_USER_KEY = "curr_user"
+
+#********** User Routes **********#
+
+#!Todo must implement a method to store the user as g in the session
+# Store the logged in user in Flask global
+@admin_bp.before_request
+def add_user_to_g():
+    """If we're logged in, add curr user to Flask global."""
+
+    if CURR_USER_KEY in session:
+        g.user = User.query.get(session[CURR_USER_KEY])
+
+    else:
+        g.user = None
+
+# **This is a helper function that is used in the login and logout routes. It is not a route itself.
+def do_login(user):
+    """Log in user."""
+
+    session[CURR_USER_KEY] = user.id
+
+
+def do_logout():
+    """Logout user."""
+
+    if CURR_USER_KEY in session:
+        del session[CURR_USER_KEY]
 
 @admin_bp.route('/admin')
 def show_admin():
@@ -50,15 +82,40 @@ def handle_signup_form():
             bio=bio
         )
         
-        db.session.add(new_user)
-        db.session.commit()
-        flash('User created successfully!')
-        # import pdb; pdb.set_trace()
-        return redirect('/admin/users/secret.html')
-        # *Currently setting up a dummy route to test the form
+        try:
+            db.session.add(new_user)
+            db.session.commit()
+            flash('User created successfully!')
+            # ?Unsure of the best place to handle the do login function
+            #We execute top down there first we add the user to the database then we commit the changes
+            #if a user has been successfully added to the database we can then log them in
+            g.user = new_user.id
+            # import pdb; pdb.set_trace()
+            return redirect('/admin/users/secret.html')
+            # *Currently setting up a dummy route to test the form 
+        except IntegrityError:
+            if User.query.filter_by(email=email).first() is not None:
+                flash("Email already taken", 'danger')
+                return render_template('users/signup.html', form=form)
+            if User.query.filter_by(username=username).first() is not None:
+                flash("Username already taken", 'danger')
+                return render_template('users/signup.html', form=form)
+           
     else:
-        flash('Invalid form submission. Please try again.')
-        return redirect('/admin/signup')
+        flash('User creation failed. Please try again.')
+        # Indicate what went wrong  with the form
+        
+        return redirect('/admin/signup', form=form)
+    #  except IntegrityError:
+    #         flash("Username already taken", 'danger')
+    #         return render_template('users/signup.html', form=form)
+
+    #     do_login(user)
+
+    #     return redirect("/")
+
+    # else:
+    #     return render_template('users/signup.html', form=form)
     
     
 @admin_bp.route('/admin/users')
@@ -72,7 +129,8 @@ def show_login():
     login_form = LoginForm()
     return render_template('/admin/users/login.html', form=login_form)
 
-#Todo create a post route for the user login that handles the authentication method available on the classmethod authenticate
+#TODO 
+#!UPDATE THIS ROUTE TO HANDLE GLOBAL USER OBJECT 
 @admin_bp.route('/admin/users/login', methods=['POST'])
 def handle_login_form():
     """Handles user authentication and authorization."""
@@ -92,5 +150,14 @@ def handle_login_form():
         flash('Invalid username or password. Please try again.')
         return redirect('/admin/users/login')
     
+    
+#Todo create a route for the user to logout
+#!in order to logout the user, you must clear the session
+#*Would be best to make a g.user object that stores the user's information that can be accessed throughout the app
+#*A great deal of this application particularly post and engagemt routes will require the user to be logged in so a g.user object would be useful
+# @admin_bp.route('/admin/users/logout')
+
+
+
     
     
