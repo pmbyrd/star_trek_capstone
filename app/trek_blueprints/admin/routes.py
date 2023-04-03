@@ -62,60 +62,35 @@ def handle_signup_form():
     """Creates a new user and adds them to the database."""
      
     form = AddUserForm()
-    if form.validate_on_submit():
-        username = form.username.data
-        email = form.email.data
-        password = form.password.data
-        first_name = form.first_name.data
-        last_name = form.last_name.data
-        avatar = form.avatar.data
-        bio = form.bio.data
-        
-        new_user = User.signup(
-            username=username,
-            email=email,
-            password=password,
-            first_name=first_name,
-            last_name=last_name,
-            avatar=avatar or DEFAULT_IMAGE_URL,
-            bio=bio
-        )
-        
+    if form.validate_on_submit():   
         try:
+            new_user = User.signup(
+            username = form.username.data,
+            email = form.email.data,
+            password = form.password.data,
+            first_name = form.first_name.data,
+            last_name = form.last_name.data,
+            avatar = form.avatar.data,
+            bio = form.bio.data
+            )
+            
             db.session.add(new_user)
             db.session.commit()
-            flash('User created successfully!')
-            # ?Unsure of the best place to handle the do login function
-            #We execute top down there first we add the user to the database then we commit the changes
-            #if a user has been successfully added to the database we can then log them in
-            g.user = new_user.id
-            # import pdb; pdb.set_trace()
-            return redirect('/admin/users/secret.html')
+            do_login(new_user)
             # *Currently setting up a dummy route to test the form 
+
+            return redirect('/admin/users/secret.html')
+
         except IntegrityError:
+            print('IntegrityError')
             # Integrate the flash messages into the form
-            print("Integrity Error")
-            
-           
-    else:
-        if User.query.filter_by(email=email).first() is not None:
-            flash("Email already taken", 'danger')
-            return render_template('users/signup.html', form=form)
-        if User.query.filter_by(username=username).first() is not None:
-            flash("Username already taken", 'danger')
+            # if User.query.filter_by(username=username).first() is not None:
+            #     flash("Username already taken", 'danger')
+            # elif User.query.filter_by(email=email).first() is not None:
+            #     flash("Email already taken", 'danger')
             # Indicate what went wrong  with the form
         
         return redirect('/admin/signup', form=form)
-    #  except IntegrityError:
-    #         flash("Username already taken", 'danger')
-    #         return render_template('users/signup.html', form=form)
-
-    #     do_login(user)
-
-    #     return redirect("/")
-
-    # else:
-    #     return render_template('users/signup.html', form=form)
     
     
 @admin_bp.route('/admin/users')
@@ -140,8 +115,7 @@ def handle_login_form():
        if form.validate_on_submit():
         username = form.username.data
         email = form.email.data
-        password = form.password.data
-        
+        password = form.password.data        
         user = User.authenticate(username=username, email=email, password=password)
         
         if user:
