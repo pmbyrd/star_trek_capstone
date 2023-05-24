@@ -145,7 +145,7 @@ def handle_login_form():
 #Todo create a route for the user to logout
 #!in order to logout the user, you must clear the session
 #*Would be best to make a g.user object that stores the user's information that can be accessed throughout the app
-#*A great deal of this application particularly post and engagemt routes will require the user to be logged in so a g.user object would be useful
+#*A great deal of this application particularly post and engagement routes will require the user to be logged in so a g.user object would be useful
 # @admin_bp.route('/admin/users/logout')
 
 
